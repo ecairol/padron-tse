@@ -1,0 +1,101 @@
+<html>
+	<title>Padrón TSE | Búsqueda rápida</title>
+	<style>
+		body {
+			font-size: sans-serif;
+			padding: 2rem;
+			background-color: lightgrey;
+		}
+		form {
+			max-width: 600px;
+			margin: 1rem auto;
+			background-color: #fff;
+			padding: 1rem;
+			box-shadow: 2px 2px 3px #bdbdbd;
+			border-radius: 2px;
+		}
+		input {
+			font-size: 1.2rem;
+			padding: 0.5rem;
+			display: block;
+			margin-bottom: 0.5rem;
+		}
+	</style>
+
+	<form action="">
+		<input type="text" placeholder="Cédula" id="cedula" maxlength="9">
+
+		<hr>
+
+		<input class="copy-on-click" type="text" id="nombre">
+		<input class="copy-on-click" type="text" id="apellido1">
+		<input class="copy-on-click" type="text" id="apellido2">
+		<input class="copy-on-click" type="text" id="provincia">
+		<input class="copy-on-click" type="text" id="canton">
+		<input class="copy-on-click" type="text" id="distrito">
+
+	</form>
+
+	<script>
+		const inputCedula = document.querySelector("#cedula");
+		const inputNombre = document.querySelector("#nombre");
+		const inputApellido1 = document.querySelector("#apellido1");
+		const inputApellido2 = document.querySelector("#apellido2");
+		const inputProvincia = document.querySelector("#provincia");
+		const inputCanton = document.querySelector("#canton");
+		const inputDistrito = document.querySelector("#distrito");
+
+		inputCedula.addEventListener( 'input', ( e ) => {
+			if ( e.target.value.length === 9 ) {
+				clearInputs();
+
+				const value = e.target.value;
+				e.target.setAttribute('disabled', true);
+				const jsonPath = `/data/${value.split('').join('/')}/${value}.json`;
+				
+
+				fetch(jsonPath)
+					.then(response => response.json())
+  					.then(data => {
+						  populateInputs( data )
+						  e.target.removeAttribute('disabled');
+					})
+					.catch((error) => {
+						alert('Error: ' + error);
+						e.target.removeAttribute('disabled');
+					});;
+
+			}
+		} );
+
+		document.querySelectorAll('.copy-on-click').forEach( ( input ) => {
+			input.addEventListener('click', ( e ) => {
+				const copyText = e.target;
+				copyText.select();
+				copyText.setSelectionRange(0, 99999);
+				navigator.clipboard.writeText(copyText.value);
+				console.log("Copiado: " + copyText.value);
+			} );
+		} )
+
+
+		function populateInputs( data ) {
+			inputNombre.value = data.nombre;
+			inputApellido1.value = data.apellido1;
+			inputApellido2.value = data.apellido2;
+			inputProvincia.value = data.provincia;
+			inputCanton.value = data.canton;
+			inputDistrito.value = data.distrito;
+		}
+
+		function clearInputs() {
+			inputNombre.value = '';
+			inputApellido1.value = '';
+			inputApellido2.value = '';
+			inputProvincia.value = '';
+			inputCanton.value = '';
+			inputDistrito.value = '';
+		}
+
+	</script>
+</html>
